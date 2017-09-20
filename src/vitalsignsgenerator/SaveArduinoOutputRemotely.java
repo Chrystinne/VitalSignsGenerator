@@ -25,6 +25,12 @@ public class SaveArduinoOutputRemotely implements SerialPortEventListener {
     private ArrayList<String> spo2Values = new ArrayList<String>();
     private ArrayList<String> temperatureValues = new ArrayList<String>();
     private ArrayList<String> positionValues = new ArrayList<String>();
+    private ArrayList<String> airflowValues = new ArrayList<String>();
+    private ArrayList<String> emgValues = new ArrayList<String>();
+    private ArrayList<String> ecgValues = new ArrayList<String>();
+    private ArrayList<String> conductivityValues = new ArrayList<String>();
+    private ArrayList<String> resistanceValues = new ArrayList<String>();
+    
 
     private int repetitions = 0;
     private int numRepetions = 40;
@@ -126,13 +132,11 @@ public class SaveArduinoOutputRemotely implements SerialPortEventListener {
 
             try {
                 String inputLine = input.readLine();
-
                 System.out.println(inputLine);
 
                 String sensors[] = inputLine.split(";");
 
                 for (int i = 0; i < sensors.length; i++) {
-
                     String values[] = sensors[i].split(":");
 
                     data = new SimpleData();
@@ -146,9 +150,9 @@ public class SaveArduinoOutputRemotely implements SerialPortEventListener {
 
                     data.setValue(values[1]);
 
-                    switch ((i + 1) % 4) {
+                    switch ((i + 1) % 9) {
                         case 0:
-                            positionValues.add(data.getValue());
+                            resistanceValues.add(data.getValue());
                             break;
                         case 1:
                             temperatureValues.add(data.getValue());
@@ -156,12 +160,26 @@ public class SaveArduinoOutputRemotely implements SerialPortEventListener {
                         case 2:
                             pulseValues.add(data.getValue());
                             break;
-                        case 3: {
+                        case 3: 
                             spo2Values.add(data.getValue());
-                        }
-                        break;
+                            break;
+                        case 4: 
+                            positionValues.add(data.getValue());
+                            break;
+                        case 5: 
+                            airflowValues.add(data.getValue());
+                            break;
+                        case 6: 
+                            emgValues.add(data.getValue());
+                            break;
+                       case 7: 
+                            ecgValues.add(data.getValue());
+                            break;
+                        case 8: 
+                            conductivityValues.add(data.getValue());
+                            break;
                     }
-
+    
                     repetitions++;
 
                     if (repetitions == numRepetions - 1) {
@@ -195,16 +213,21 @@ public class SaveArduinoOutputRemotely implements SerialPortEventListener {
         temperatureValues.clear();
         spo2Values.clear();
         positionValues.clear();
+        airflowValues.clear();
+        emgValues.clear();
+        ecgValues.clear();
+        conductivityValues.clear();
+        resistanceValues.clear();
     }
 
     public String simulaVariacao(SimpleData simpleData) {
         String variation = null;
-        switch (simpleData.getIdSensor() % 4) {
+        switch (simpleData.getIdSensor() % 9) {
             case 0: {
-                if (!variou(positionValues)) {
+                if (!variou(resistanceValues)) {
                     variation = "right position";
                 }
-                positionValues.add(variation);
+                resistanceValues.add(variation);
                 break;
             }
             case 1:
@@ -226,7 +249,37 @@ public class SaveArduinoOutputRemotely implements SerialPortEventListener {
                 }
                 spo2Values.add(variation);
                 break;
-
+            case 4: {
+                if (!variou(positionValues)) {
+                    variation = "right position";
+                }
+                positionValues.add(variation);
+                break;
+            }
+            case 5:
+                if (!variou(airflowValues)) {
+                    variation = "15";
+                }
+                airflowValues.add(variation);
+                break;
+            case 6:
+                if (!variou(emgValues)) {
+                    variation = "850";
+                }
+                emgValues.add(variation);
+                break;
+            case 7:
+                if (!variou(ecgValues)) {
+                    variation = "6";
+                }
+                ecgValues.add(variation);
+                break;
+            case 8:
+                if (!variou(conductivityValues)) {
+                    variation = "0.48";
+                }
+                conductivityValues.add(variation);
+                break;
         }
         return variation;
     }
